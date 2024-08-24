@@ -9,7 +9,6 @@ class BlogController extends Controller
 {
   public function index()
   {
-    //echo (csrf_token());
     $blogs = Blog::with('comments')->get();
     return response()->json($blogs);
   }
@@ -26,12 +25,17 @@ class BlogController extends Controller
 
   public function store(Request $req)
   {
+    request()->validate([
+      'title' => ['required', 'min:3'],
+      'body' => ['required']
+    ]);
+
     Blog::create([
       'title' => $req->title,
       'body' => $req->body,
     ]);
 
-    return response()->json(201);
+    return response()->json(null, 201);
   }
 
   public function update(Request $update, int $id)
@@ -42,6 +46,10 @@ class BlogController extends Controller
     if (!$blog) {
       return response()->json(['message' => 'Not found'], 404);
     }
+    request()->validate([
+      'title' => ['required', 'min:3'],
+      'body' => ['required']
+    ]);
 
     $blog->update([
       'title' => $update->title,
